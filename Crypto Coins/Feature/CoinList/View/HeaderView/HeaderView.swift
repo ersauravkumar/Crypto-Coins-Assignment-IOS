@@ -27,6 +27,7 @@ final class HeaderView: UIView {
         let searchBar = UISearchBar()
         searchBar.placeholder = "Search"
         searchBar.translatesAutoresizingMaskIntoConstraints = false
+        searchBar.searchBarStyle = .prominent
         return searchBar
     }()
     
@@ -53,6 +54,7 @@ private extension HeaderView {
         searchBar.delegate = self
         setupViewHierarchy()
         setupViewConstraints()
+        setupInputAccessoryView()
     }
     
     func setupViewHierarchy() {
@@ -70,6 +72,22 @@ private extension HeaderView {
         searchBar.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16).isActive = true
         searchBar.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -8).isActive = true
     }
+    
+     func setupInputAccessoryView() {
+        let toolbar = UIToolbar()
+        toolbar.sizeToFit()
+        
+        let doneButton = UIBarButtonItem(title: "Done", style: .done, target: self, action: #selector(doneButtonTapped))
+        toolbar.items = [doneButton]
+        
+        if let textField = searchBar.value(forKey: "searchField") as? UITextField {
+            textField.inputAccessoryView = toolbar
+        }
+    }
+    
+    @objc private func doneButtonTapped() {
+        searchBar.resignFirstResponder() // Hide the keyboard
+    }
 }
 
 //MARK: Exposed methods
@@ -85,5 +103,9 @@ extension HeaderView: UISearchBarDelegate {
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         delegate?.headerView(self, didUpdateSearchText: searchText)
+    }
+    
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        searchBar.resignFirstResponder()
     }
 }

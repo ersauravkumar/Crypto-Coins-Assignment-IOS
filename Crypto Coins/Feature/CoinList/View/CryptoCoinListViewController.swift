@@ -10,6 +10,13 @@ import UIKit
 class CryptoCoinListViewController: UIViewController {
     
     // MARK: - UI Components
+    private let topView: UIView = {
+        let view = UIView()
+        view.backgroundColor = UIColor(red: 89/255, green: 13/255, blue: 228/255, alpha: 1.0)
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    
     private let headerView = {
         let view = HeaderView()
         view.configure(title: "COIN")
@@ -39,6 +46,14 @@ class CryptoCoinListViewController: UIViewController {
     
     //MARK: Variables
     private let viewModel: CryptoCoinViewModel
+        
+    private var safeAreaHeight: CGFloat {
+        UIApplication
+            .shared
+            .connectedScenes
+            .flatMap { ($0 as? UIWindowScene)?.windows ?? [] }
+            .first { $0.isKeyWindow }?.safeAreaInsets.top ?? 0.0
+    }
     
     //MARK: View Life cycle
     init(viewModel: CryptoCoinViewModel) {
@@ -65,6 +80,7 @@ private extension CryptoCoinListViewController {
     
     func setupView() {
         view.backgroundColor = .white
+        navigationController?.setNavigationBarHidden(true, animated: true)
         headerView.delegate = self
         cryptoFilterView.delegate = self
         viewModel.delegate = self
@@ -74,6 +90,7 @@ private extension CryptoCoinListViewController {
     }
     
     func setupViewHierarchy() {
+        view.addSubview(topView)
         view.addSubview(headerView)
         view.addSubview(tableView)
         view.addSubview(cryptoFilterView)
@@ -81,7 +98,12 @@ private extension CryptoCoinListViewController {
     }
     
     func setupViewConstraints() {
-        headerView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
+        topView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
+        topView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        topView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        topView.heightAnchor.constraint(equalToConstant: safeAreaHeight).isActive = true
+        
+        headerView.topAnchor.constraint(equalTo: topView.bottomAnchor).isActive = true
         headerView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         headerView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         headerView.heightAnchor.constraint(equalToConstant: 60).isActive = true
